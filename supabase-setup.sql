@@ -28,7 +28,7 @@ create policy "authenticated update" on public.board
   for update to authenticated using (true) with check (true);
 
 -- 4) Seed the initial empty board.
---    The id MUST match BOARD_ID in cbo-hiring.html (default: cbo-fiverr-2026)
+--    The id MUST match BOARD_ID in index.html (default: cbo-fiverr-2026)
 insert into public.board (id, data)
 values ('cbo-fiverr-2026', '{"candidates":[]}')
 on conflict (id) do nothing;

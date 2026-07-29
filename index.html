@@ -162,6 +162,7 @@ var LZString=function(){function o(o,r){if(!t[o]){t[o]={};for(var n=0;n<o.length
       <div class="nav-label">תצוגות</div>
       <div class="nav-item active" onclick="showView('dashboard')" id="nav-dashboard">📊 דשבורד</div>
       <div class="nav-item" onclick="showView('compare')" id="nav-compare">⚖️ השוואת מועמדים</div>
+      <div class="nav-item" onclick="showView('guidelines')" id="nav-guidelines">📖 הנחיות</div>
     </div>
     <div class="nav-section">
       <div class="nav-label">מועמדים</div>
@@ -197,6 +198,10 @@ var LZString=function(){function o(o,r){if(!t[o]){t[o]={};for(var n=0;n<o.length
     <div id="view-compare" style="display:none">
       <div class="page-header"><div><h1>השוואת מועמדים</h1></div></div>
       <div id="compare-content"></div>
+    </div>
+    <div id="view-guidelines" style="display:none">
+      <div class="page-header"><div><h1>📖 הנחיות</h1></div></div>
+      <div id="guidelines-content"></div>
     </div>
     <div id="view-candidate" style="display:none">
       <div id="candidate-content"></div>
@@ -268,7 +273,7 @@ function setSync(txt,color){ const el=document.getElementById('sync-status'); if
 async function pushToSupabase(){
   if(!(USE_SUPABASE && sb && authed)) return;
   try{
-    const { error } = await sb.from('board').upsert({ id: BOARD_ID, data: { candidates: state.candidates }, updated_at: new Date().toISOString() });
+    const { error } = await sb.from('board').upsert({ id: BOARD_ID, data: { candidates: state.candidates, guidelines: state.guidelines }, updated_at: new Date().toISOString() });
     if(error) throw error;
     setSync('✔ מסונכרן','#16a34a');
   }catch(e){ setSync('⚠ שגיאת סנכרון','#dc2626'); console.error('sync push',e); }
@@ -280,26 +285,38 @@ async function pullFromSupabase(){
     if(error){ console.error('sync pull',error); return; }
     if(data && data.data && Array.isArray(data.data.candidates)){
       state.candidates = data.data.candidates;
+      if(typeof data.data.guidelines === 'string') state.guidelines = data.data.guidelines;
       localStorage.setItem(STORE_KEY, JSON.stringify(state));
     }
   }catch(e){ console.error('sync pull',e); }
 }
 
+const DEFAULT_GUIDELINES = `אתמול מיכה ואיילת ישבו ועשו בריינסטורם על איך מיכה רואה את תהליך הגיוס של ה CBO ולהלן כמה דברים שלקחתי משם:
+1. המטרה מבחינתו- תוך שבועיים לקבל שני מועמדים חזקים שעברו את כל התהליך שלעיל.
+2. המועמד צריך להיות פרנטר של ממש ואידיאלית גם סקססור ומתוך הראיה הזו צריך לשקול את המועמדים.
+3. אסתי- הוא רואה בך מישהי שנכון שבראיונות תסתכל על הדינמיקה של המועמד וההתאמה שלו לארגון ולהנהלה הבכירה. היכולת שלו להשתלב, להוביל, להשפיע, לרתום, ולהיות צלע אפקטיבית בתוך הקבוצה. insperation, leadership, direction. וגם חשובה יכולת ההתאמה שלו למיכה. כמובן שבדיקה של הראיה העסקית וההבנה של הביזנס.
+4. שרון- חוות דעת כללית ומשלימה של אסתי.
+5. הוא היה רוצה לקבל משתיכן נקודות, אם יש דגלים אדומים ממש אז אין בכלל מה להמשיך, ולקבל ממש דגשים למה הוא צריך לשים לב בראיון שלו, מה היה לכן חסר, מה לא היה זמן לחפור בו יותר ונראה לכן שכדאי וכו.
+6. חברי בורד יוכלו גם לראיין, לשיקול דעתו של מיכה, ואם זה קורה, חשוב שהמועמד יבין שזו גם הזדמנות לחשיפה עבורו, וגם מקום בשבילו לשאול אותם שאלות.
+7. מי שיעבור את כל זה ימשיך עם מיכה ליותר מפגישה אחת, אידיאלית פגישה ארוכה יותר שבה המטרה היא להרגיש קומפורט הדדי.
+8. האמור נרשם בלשון זכר אבל כמובן רלוונטי לכל מין וסוג 🙂`;
+
 function loadState() {
   // נסה את המפתח הנוכחי
-  try { const r = localStorage.getItem(STORE_KEY); if (r) { const p = JSON.parse(r); if (p && p.candidates) return p; } } catch(e) {}
+  try { const r = localStorage.getItem(STORE_KEY); if (r) { const p = JSON.parse(r); if (p && p.candidates) { if(typeof p.guidelines !== 'string') p.guidelines = DEFAULT_GUIDELINES; return p; } } } catch(e) {}
   // נסה להגר ממפתחות ישנים
   for (const k of OLD_KEYS) {
     try {
       const r = localStorage.getItem(k);
       if (r) { const p = JSON.parse(r); if (p && p.candidates && p.candidates.length > 0) {
-        localStorage.setItem(STORE_KEY, r);
+        if(typeof p.guidelines !== 'string') p.guidelines = DEFAULT_GUIDELINES;
+        localStorage.setItem(STORE_KEY, JSON.stringify(p));
         localStorage.removeItem(k);
         return p;
       }}
     } catch(e) {}
   }
-  return { candidates: [] };
+  return { candidates: [], guidelines: DEFAULT_GUIDELINES };
 }
 function saveState() {
   localStorage.setItem(STORE_KEY, JSON.stringify(state)); // local cache / offline
@@ -401,7 +418,7 @@ function doImport() {
 
 // ── VIEWS ──
 function showView(view, candidateId) {
-  ['dashboard','compare','candidate'].forEach(v => document.getElementById('view-'+v).style.display = 'none');
+  ['dashboard','compare','guidelines','candidate'].forEach(v => document.getElementById('view-'+v).style.display = 'none');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   currentView = view;
   if (view === 'dashboard') {
@@ -412,6 +429,11 @@ function showView(view, candidateId) {
     document.getElementById('view-compare').style.display = '';
     document.getElementById('nav-compare').classList.add('active');
     renderCompare();
+  } else if (view === 'guidelines') {
+    document.getElementById('view-guidelines').style.display = '';
+    document.getElementById('nav-guidelines').classList.add('active');
+    guidelinesEditing = false;
+    renderGuidelines();
   } else if (view === 'candidate') {
     document.getElementById('view-candidate').style.display = '';
     state.activeCandidate = candidateId;
@@ -439,6 +461,7 @@ function addCandidate() {
     addedAt: new Date().toLocaleDateString('he-IL'),
     bounty: '',
     intake: collectIntake(),
+    questionnaire: {},
     sharon: { overallImpression:0, partnerPotential:0, strengths:'', concerns:'', redFlags:'', notExplored:'', recommendation:'', updatedAt:null },
     esti:   { dynamics:0, leadership:0, michaFit:0, orgFit:0, bizVision:0, strengths:'', concerns:'', redFlags:'', notExplored:'', recommendation:'', updatedAt:null },
     extra:  { interviewerName:'', overall:0, strengths:'', concerns:'', redFlags:'', notExplored:'', recommendation:'', updatedAt:null }
@@ -545,7 +568,7 @@ function renderCandidate(id) {
     </div>
     ${topAlert}
     <div class="tabs">
-      ${[{id:'cv',l:'📄 קו"ח'},{id:'sharon',l:'🟪 שרון'},{id:'esti',l:'🟦 אסתי'},{id:'extra',l:'🟧 ראיון נוסף'},{id:'micha',l:'⭐ תדריך מיכה'}]
+      ${[{id:'cv',l:'📄 קו"ח'},{id:'questionnaire',l:'📝 שאלון'},{id:'sharon',l:'🟪 שרון'},{id:'esti',l:'🟦 אסתי'},{id:'extra',l:'🟧 ראיון נוסף'},{id:'micha',l:'⭐ תדריך מיכה'}]
         .map(t=>`<div class="tab ${currentTab===t.id?'active':''}" onclick="switchTab('${id}','${t.id}')">${t.l}</div>`).join('')}
     </div>
     <div id="tab-content"></div>`;
@@ -555,6 +578,7 @@ function switchTab(id,tab){currentTab=tab;renderCandidate(id);}
 function renderTab(c,tab){
   const el=document.getElementById('tab-content');
   if(tab==='cv')el.innerHTML=renderCV(c);
+  else if(tab==='questionnaire')el.innerHTML=renderQuestionnaire(c);
   else if(tab==='sharon')el.innerHTML=renderSharonForm(c);
   else if(tab==='esti')el.innerHTML=renderEstiForm(c);
   else if(tab==='extra')el.innerHTML=renderExtraForm(c);
@@ -571,6 +595,34 @@ function renderCV(c){return renderIntakeDisplay(c)+`<div class="card"><div class
   <div class="form-row"><label>🏢 הערות באונטי (חברת ההשמה)</label><textarea id="cv-bounty" rows="4" placeholder="הערות, רשמים, מידע נוסף שהועבר מהחברת ההשמה...">${escHtml(c.bounty||'')}</textarea></div>
   <div class="btn-row"><button class="btn btn-primary" onclick="saveCV('${c.id}')">💾 שמור</button></div></div>`;}
 function saveCV(id){const c=state.candidates.find(x=>x.id===id);c.role=document.getElementById('cv-role').value.trim();c.company=document.getElementById('cv-company').value.trim();c.linkedin=document.getElementById('cv-linkedin').value.trim();c.cv=document.getElementById('cv-text').value.trim();c.bounty=document.getElementById('cv-bounty').value.trim();saveState();renderSidebar();currentTab='cv';renderCandidate(id);}
+
+// ── QUESTIONNAIRE (from JD) ──
+const QUESTIONNAIRE = [
+  {key:'pnl',        q:'P&L והכנסות: ניסיון בבעלות מלאה על P&L ו-revenue streams — היקף, החלטות ותוצאות מדידות.'},
+  {key:'salesOrg',   q:'ארגון מכירות בקנה מידה גדול: הארגון המסחרי הגדול ביותר שהוביל/ה — גודל, מבנה, צמיחה.'},
+  {key:'opsExcel',   q:'מצוינות תפעולית: תהליך/מערכת תפעולית מורכבת שבנה/ייעל/ה וההשפעה על התוצאה.'},
+  {key:'dataDetail', q:'Data-driven ותשומת לב לפרטים: ירידה לרזולוציית מטריקות — דוגמה שבה פרט שינה תוצאה מאקרו.'},
+  {key:'corpSchool', q:'רקע "בית ספר קורפורטיבי": ניהול בארגונים גדולים ומבוססים מחוץ לטק (FMCG/Retail/Telecom/תאגיד גלובלי).'},
+  {key:'scaleVsStartup', q:'Corporate scale מול startup: יכולת לתפעל ולפקד על מערכות גדולות ומבוססות (לא בנייה מאפס).'},
+  {key:'aiFluency',  q:'AI Fluency: תפיסת נוף ה-AI והשפעתו על marketplace/productization — דוגמה ליישום/החלטה.'},
+  {key:'strategy',   q:'Strategic Execution: תרגום אסטרטגיה ל-KPIs ותוכניות תפעוליות עם accountability — דוגמה.'},
+  {key:'stakeholderEQ', q:'Stakeholder & EQ: ניהול דינמיקה ארגונית מורכבת בין מחלקות — איך רתם/ה ואיחד/ה.'},
+  {key:'leadership', q:'סגנון מנהיגות ו-accountability: החזקת אנשים באחריות והנעת שינוי לצד empathy והקשבה.'},
+  {key:'partner',    q:'Partner/Successor: תפיסת מערכת היחסים עם ה-CEO והשאיפה ל-3–5 שנים.'},
+];
+function renderQuestionnaire(c){
+  const qa = c.questionnaire || {};
+  return `<div class="card"><div class="card-title">📝 שאלון מבוסס תיאור המשרה</div>
+    ${QUESTIONNAIRE.map(item=>`<div class="form-row"><label>${escHtml(item.q)}</label><textarea id="qn-${item.key}" rows="3" placeholder="תשובה...">${escHtml(qa[item.key]||'')}</textarea></div>`).join('')}
+    <div class="btn-row"><button class="btn btn-primary" onclick="saveQuestionnaire('${c.id}')">💾 שמור</button></div>
+  </div>`;
+}
+function saveQuestionnaire(id){
+  const c=state.candidates.find(x=>x.id===id);
+  if(!c.questionnaire) c.questionnaire={};
+  QUESTIONNAIRE.forEach(item=>{ c.questionnaire[item.key]=document.getElementById('qn-'+item.key).value.trim(); });
+  saveState(); currentTab='questionnaire'; renderCandidate(id);
+}
 
 // ── SHARON FORM ──
 function renderSharonForm(c){const s=c.sharon;return`<div class="card">
@@ -844,6 +896,35 @@ function renderCompare(){
   ].map((row,ri)=>`<tr style="background:${ri%2===0?'#fff':'#fafafa'};"><td style="padding:7px 10px;font-size:11px;color:#555;border-bottom:1px solid #f5f5f5;">${row.l}</td>${sorted.map(c=>{const v=row.f(c);const isNum=v!=='—'&&v!=='יש'&&v!=='אין'&&!isNaN(parseFloat(v));return`<td style="text-align:center;padding:7px 10px;border-bottom:1px solid #f5f5f5;">${isNum?`<span class="score-pill ${scoreClass(v)}">${v}</span>`:v==='יש'?'<span style="color:#dc2626;font-weight:700;">🚩</span>':v==='אין'?'<span style="color:#16a34a;">✓</span>':`<span style="color:#ccc;">${v}</span>`}</td>`;}).join('')}</tr>`).join('')}</tbody></table></div></div>`;
 }
 
+// ── GUIDELINES ──
+let guidelinesEditing = false;
+function renderGuidelines(){
+  const el = document.getElementById('guidelines-content');
+  if(!el) return;
+  if(guidelinesEditing){
+    el.innerHTML = `<div class="card">
+      <textarea id="guidelines-edit" rows="18" style="white-space:pre-wrap;">${escHtml(state.guidelines||'')}</textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="saveGuidelines()">💾 שמור</button>
+        <button class="btn btn-secondary" onclick="cancelEditGuidelines()">ביטול</button>
+      </div>
+    </div>`;
+  } else {
+    el.innerHTML = `<div class="card">
+      <div style="white-space:pre-wrap;line-height:1.7;font-size:13px;">${escHtml(state.guidelines||'')}</div>
+      <div class="btn-row"><button class="btn btn-secondary" onclick="editGuidelines()">✏️ ערוך</button></div>
+    </div>`;
+  }
+}
+function editGuidelines(){ guidelinesEditing = true; renderGuidelines(); }
+function cancelEditGuidelines(){ guidelinesEditing = false; renderGuidelines(); }
+function saveGuidelines(){
+  state.guidelines = document.getElementById('guidelines-edit').value;
+  guidelinesEditing = false;
+  saveState();
+  renderGuidelines();
+}
+
 // ── INTAKE QUESTIONS ──
 const INTAKE_QUESTIONS = [
   { key: 'background',  label: 'רקע ארגוני',                    options: ['תאגיד / FMCG / Retail / Telecom', 'חברת טכנולוגיה גדולה (+1000)', 'Scale-up / Growth Stage', 'סטארטאפ מוקדם'] },
@@ -980,11 +1061,14 @@ function subscribeRealtime(){
       const incoming = payload.new && payload.new.data;
       if(!incoming || !Array.isArray(incoming.candidates)) return;
       state.candidates = incoming.candidates;
+      if(typeof incoming.guidelines === 'string') state.guidelines = incoming.guidelines;
       localStorage.setItem(STORE_KEY, JSON.stringify(state));
       renderSidebar();
       if(currentView==='dashboard') renderDashboard();
       else if(currentView==='compare') renderCompare();
       else if(currentView==='candidate') showRefreshNotice();
+      else if(currentView==='guidelines' && !guidelinesEditing) renderGuidelines();
+      else if(currentView==='guidelines') showRefreshNotice();
     }).subscribe();
 }
 async function boot(){
