@@ -70,7 +70,7 @@
   .toolbar-row input[type=search] { min-height: 38px; }
   .board { display: grid; grid-template-columns: repeat(4, minmax(230px,1fr)); gap: 14px; }
   .board-col { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-sm); min-height: 200px; display: flex; flex-direction: column; overflow: hidden; }
-  .board-col.is-flag .board-card { border-color: var(--danger-border); }
+  .board-card.is-flag { border-color: var(--danger-border); }
   .board-col-head { padding: 12px 13px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); font-weight: 800; font-size: 12.5px; }
   .board-count { color: var(--ink-500); font-size: 11.5px; font-weight: 700; background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; }
   .board-cards { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
@@ -569,11 +569,13 @@ function emoji(c) { if(hasRedFlags(c))return'🚩'; const v=overallScore(c); if(
 function renderSidebar() {}
 
 // ── DASHBOARD (board view) ──
+function hasSharonData(c) { return [c.sharon.overallImpression,c.sharon.partnerPotential].some(v=>v>0)||!!c.sharon.strengths; }
+function hasEstiData(c) { return [c.esti.dynamics,c.esti.leadership,c.esti.michaFit,c.esti.orgFit,c.esti.bizVision].some(v=>v>0)||!!c.esti.strengths; }
 const BOARD_COLUMNS = [
-  { key:'new',     label:'חדש',              match: c => !hasRedFlags(c) && interviewProgress(c)===0 },
-  { key:'partial', label:'⏳ ראיון אחד',       match: c => !hasRedFlags(c) && interviewProgress(c)===1 },
-  { key:'ready',   label:'✅ מוכן למיכה',      match: c => !hasRedFlags(c) && interviewProgress(c)>=2 },
-  { key:'flag',    label:'🚩 דגלים אדומים',   match: c => hasRedFlags(c), flagCol:true },
+  { key:'new',    label:'חדש',         match: c => !hasSharonData(c) && !hasEstiData(c) },
+  { key:'sharon', label:'שרון',        match: c => hasSharonData(c) && !hasEstiData(c) },
+  { key:'esti',   label:'אסתי',        match: c => hasEstiData(c) && !hasSharonData(c) },
+  { key:'ready',  label:'מוכן למיכה',  match: c => hasSharonData(c) && hasEstiData(c) },
 ];
 function renderDashboard() {
   const notice = document.getElementById('merge-notice');
@@ -596,12 +598,13 @@ function renderDashboard() {
 
   el.innerHTML = `<div class="board">${BOARD_COLUMNS.map(col => {
     const items = list.filter(col.match);
-    return `<div class="board-col${col.flagCol?' is-flag':''}">
+    return `<div class="board-col">
       <div class="board-col-head"><span>${col.label}</span><span class="board-count">${items.length}</span></div>
       <div class="board-cards">
         ${items.length ? items.map(c => {
           const ov = overallScore(c);
-          return `<div class="board-card" onclick="showView('candidate','${c.id}')">
+          const flag = hasRedFlags(c);
+          return `<div class="board-card${flag?' is-flag':''}" onclick="showView('candidate','${c.id}')">
             <div class="board-card-top">
               <div>
                 <div class="board-card-name">${emoji(c)} ${escHtml(c.name)}</div>
@@ -610,6 +613,7 @@ function renderDashboard() {
             </div>
             <div class="board-card-foot">
               ${ov?`<span class="score-pill ${scoreClass(ov)}">${ov}</span>`:'<span class="tag tag-gray">לא דורג</span>'}
+              ${flag?`<span class="tag tag-red">🚩</span>`:''}
             </div>
           </div>`;
         }).join('') : `<div class="board-empty">אין מועמדים בשלב זה</div>`}
@@ -664,7 +668,7 @@ function renderCV(c){return renderIntakeDisplay(c)+`<div class="card"><div class
   <div class="divider"></div>
   <div class="form-row"><label>🏢 הערות באונטי (חברת ההשמה)</label><textarea id="cv-bounty" rows="4" placeholder="הערות, רשמים, מידע נוסף שהועבר מהחברת ההשמה...">${escHtml(c.bounty||'')}</textarea></div>
   <div class="btn-row"><button class="btn btn-primary" onclick="saveCV('${c.id}')">💾 שמור</button></div></div>`;}
-function saveCV(id){const c=state.candidates.find(x=>x.id===id);c.role=document.getElementById('cv-role').value.trim();c.company=document.getElementById('cv-company').value.trim();c.linkedin=document.getElementById('cv-linkedin').value.trim();c.cv=document.getElementById('cv-text').value.trim();c.bounty=document.getElementById('cv-bounty').value.trim();saveState();renderSidebar();currentTab='cv';renderCandidate(id);}
+function saveCV(id){const c=state.candidates.find(x=>x.id===id);c.role=document.getElementById('cv-role').value.trim();c.company=document.getElementById('cv-company').value.trim();c.linkedin=document.getElementById('cv-linkedin').value.trim();c.cv=document.getElementById('cv-text').value.trim();c.bounty=document.getElementById('cv-bounty').value.trim();saveState();showView('dashboard');}
 
 // ── QUESTIONNAIRE (from JD) ──
 const QUESTIONNAIRE = [
