@@ -81,6 +81,14 @@
   .board-card-role { color: var(--ink-500); font-size: 11.5px; margin-top: 2px; }
   .board-card-foot { margin-top: 9px; display: flex; align-items: center; justify-content: space-between; gap: 6px; }
   .board-empty { padding: 20px 12px; text-align: center; color: var(--ink-400); font-size: 11.5px; }
+  .stage-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: 14px 16px; margin-bottom: 20px; box-shadow: var(--shadow-sm); }
+  .stage-label { font-size: 11.5px; font-weight: 700; color: var(--ink-500); margin-bottom: 9px; }
+  .stage-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .stage-btn { padding: 9px 16px; border-radius: 999px; border: 1.5px solid var(--line-strong); background: var(--surface-2); color: var(--ink-500); font-size: 12.5px; font-weight: 700; cursor: pointer; transition: background .12s, border-color .12s, color .12s; }
+  .stage-btn:hover { border-color: var(--brand); color: var(--brand-dark); }
+  .stage-btn.current { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .stage-btn.current:hover { color: #fff; }
+  .stage-btn.done { background: #fff; border-color: var(--brand); color: var(--brand-dark); }
   .card { background: var(--surface); border-radius: var(--r-md); border: 1px solid var(--line); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow-sm); }
   .card-title { font-size: 14.5px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; color: var(--ink-900); letter-spacing: -.01em; }
   .tabs { display: flex; gap: 3px; margin-bottom: 22px; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 3px; flex-wrap: wrap; }
@@ -537,6 +545,7 @@ function addCandidate() {
     linkedin: document.getElementById('new-linkedin').value.trim(),
     addedAt: new Date().toLocaleDateString('he-IL'),
     bounty: '',
+    stage: 'new',
     intake: collectIntake(),
     questionnaire: {},
     sharon: { overallImpression:0, partnerPotential:0, strengths:'', concerns:'', redFlags:'', notExplored:'', recommendation:'', updatedAt:null },
@@ -569,14 +578,21 @@ function emoji(c) { if(hasRedFlags(c))return'🚩'; const v=overallScore(c); if(
 function renderSidebar() {}
 
 // ── DASHBOARD (board view) ──
-function hasSharonData(c) { return [c.sharon.overallImpression,c.sharon.partnerPotential].some(v=>v>0)||!!c.sharon.strengths; }
-function hasEstiData(c) { return [c.esti.dynamics,c.esti.leadership,c.esti.michaFit,c.esti.orgFit,c.esti.bizVision].some(v=>v>0)||!!c.esti.strengths; }
-const BOARD_COLUMNS = [
-  { key:'new',    label:'חדש',         match: c => !hasSharonData(c) && !hasEstiData(c) },
-  { key:'sharon', label:'שרון',        match: c => hasSharonData(c) && !hasEstiData(c) },
-  { key:'esti',   label:'אסתי',        match: c => hasEstiData(c) && !hasSharonData(c) },
-  { key:'ready',  label:'מוכן למיכה',  match: c => hasSharonData(c) && hasEstiData(c) },
+const STAGES = [
+  { key:'new',    label:'חדש' },
+  { key:'sharon', label:'שרון' },
+  { key:'esti',   label:'אסתי' },
+  { key:'ready',  label:'מוכן למיכה' },
 ];
+function getStage(c) { return c.stage || 'new'; }
+function setStage(id, stage) {
+  const c = state.candidates.find(x=>x.id===id);
+  if (!c) return;
+  c.stage = stage;
+  saveState();
+  showView('dashboard');
+}
+const BOARD_COLUMNS = STAGES.map(s => ({ key:s.key, label:s.label, match: c => getStage(c)===s.key }));
 function renderDashboard() {
   const notice = document.getElementById('merge-notice');
   if (mergeMessage) { notice.innerHTML=`<div class="alert alert-success" style="margin-bottom:16px;">${mergeMessage}</div>`; mergeMessage=null; } else { notice.innerHTML=''; }
@@ -622,6 +638,19 @@ function renderDashboard() {
   }).join('')}</div>`;
 }
 
+function renderStageControl(c) {
+  const curIdx = STAGES.findIndex(s => s.key === getStage(c));
+  return `<div class="stage-card">
+    <div class="stage-label">שלב בתהליך</div>
+    <div class="stage-row">
+      ${STAGES.map((s,i)=>{
+        const cls = i===curIdx ? 'current' : i<curIdx ? 'done' : '';
+        return `<div class="stage-btn ${cls}" onclick="setStage('${c.id}','${s.key}')">${i<curIdx?'✓ ':''}${s.label}</div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
 // ── CANDIDATE ──
 function renderCandidate(id) {
   const c = state.candidates.find(x=>x.id===id);
@@ -641,6 +670,7 @@ function renderCandidate(id) {
       </div>
     </div>
     ${topAlert}
+    ${renderStageControl(c)}
     <div class="tabs">
       ${[{id:'cv',l:'📄 קו"ח'},{id:'questionnaire',l:'📝 שאלון'},{id:'sharon',l:'🟪 שרון'},{id:'esti',l:'🟦 אסתי'},{id:'extra',l:'🟧 ראיון נוסף'},{id:'micha',l:'⭐ תדריך מיכה'}]
         .map(t=>`<div class="tab ${currentTab===t.id?'active':''}" onclick="switchTab('${id}','${t.id}')">${t.l}</div>`).join('')}
