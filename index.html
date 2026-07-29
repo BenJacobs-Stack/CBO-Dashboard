@@ -661,7 +661,7 @@ function renderCandidate(id) {
   const topAlert = flag
     ? `<div class="alert alert-danger">🚩 יש דגל אדום – לשקול עצירת התהליך</div>`
     : prog>=2 ? `<div class="alert alert-success">✅ עבר שני ראיונות – מוכן לתדריך מיכה</div>`
-    : prog===1 ? `<div class="alert alert-warning">⏳ ממתין לראיון נוסף</div>` : '';
+    : '';
   document.getElementById('candidate-content').innerHTML=`
     <div class="page-header">
       <div><h1>${emoji(c)} ${c.name}</h1><p>${c.role}${c.company?' · '+c.company:''} · נוסף: ${c.addedAt}${c.linkedin?` · <a href="${escHtml(c.linkedin)}" target="_blank" style="color:#1a56db;text-decoration:none;font-size:12px;">🔗 LinkedIn</a>`:''}</p></div>
