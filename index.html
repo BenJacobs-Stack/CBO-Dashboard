@@ -54,47 +54,43 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { -webkit-text-size-adjust: 100%; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: var(--canvas); color: var(--ink-900); font-size: 14px; line-height: 1.45; direction: rtl; -webkit-font-smoothing: antialiased; }
-  .app { display: flex; height: 100vh; overflow: hidden; }
-  .sidebar { width: 260px; min-width: 260px; background: var(--surface); border-left: 1px solid var(--line); display: flex; flex-direction: column; overflow-y: auto; }
-  .main { flex: 1; overflow-y: auto; padding: 28px 32px; min-width: 0; }
-  .sidebar-brand { background: var(--header-bg); padding: 18px 18px 14px; }
-  .sidebar-header { display: flex; align-items: center; gap: 10px; }
-  .brand-mark { width: 34px; height: 34px; flex-shrink: 0; border-radius: var(--r-sm); background: linear-gradient(160deg, var(--brand), var(--brand-dark)); display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: var(--shadow-sm); }
-  .sidebar-header-text { min-width: 0; }
-  .sidebar-header h2 { font-size: 13.5px; font-weight: 700; color: var(--header-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -.01em; }
-  .sidebar-header small { font-size: 11px; color: var(--header-sub); display: block; margin-top: 1px; }
-  #user-bar { font-size: 11.5px; color: var(--header-sub); margin-top: 10px; }
+  .app { min-height: 100vh; display: flex; flex-direction: column; }
+  .topbar { background: var(--header-bg); color: #fff; padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+  .topbar h1 { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -.01em; }
+  .topbar .subtitle { font-size: 12.5px; color: var(--header-sub); margin-top: 4px; }
+  #user-bar { font-size: 11.5px; color: var(--header-sub); margin-top: 8px; }
   #user-bar a { color: #fff !important; }
   #sync-status { margin-top: 8px; display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; font-size: 10.5px; font-weight: 700; background: rgba(255,255,255,.11); color: var(--header-sub); }
   #sync-status:empty { display: none; }
-  .nav-section { padding: 10px 0; }
-  .nav-section + .nav-section { border-top: 1px solid var(--line); }
-  .nav-label { font-size: 10px; font-weight: 700; color: var(--ink-400); text-transform: uppercase; letter-spacing: 0.6px; padding: 4px 18px 8px; }
-  .nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 14px; margin: 1px 8px; border-radius: var(--r-sm); cursor: pointer; font-size: 12.5px; color: var(--ink-700); transition: background .12s, color .12s; }
-  .nav-item:hover { background: var(--surface-2); }
-  .nav-item.active { background: var(--brand-soft); color: var(--brand-dark); font-weight: 700; box-shadow: inset 2.5px 0 0 var(--brand); }
-  .nav-item .sbadge { margin-right: auto; font-size: 10px; font-weight: 700; border-radius: 10px; padding: 1px 7px; background: var(--surface-2); color: var(--ink-500); border: 1px solid var(--line); }
-  .nav-item .sbadge.good { background: var(--success-soft); color: var(--success); border-color: var(--success-border); }
-  .nav-item .sbadge.mid { background: var(--warning-soft); color: var(--warning); border-color: var(--warning-border); }
-  .nav-item .sbadge.low { background: var(--danger-soft); color: var(--danger); border-color: var(--danger-border); }
-  .nav-item .sbadge.flag { background: var(--danger-soft); color: var(--danger); border-color: var(--danger-border); }
-  .nav-item.candidate-item { align-items: center; padding: 7px 14px; }
-  .cand-emoji { flex-shrink: 0; font-size: 13px; width: 18px; text-align: center; }
-  .cand-meta { flex: 1; min-width: 0; }
-  .cand-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12.5px; }
-  .cand-role { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 10.5px; color: var(--ink-400); margin-top: 1px; font-weight: 500; }
-  .sidebar-actions { padding: 8px 10px 12px; margin-top: auto; border-top: 1px solid var(--line); }
-  .add-btn { margin: 8px 2px 6px; background: var(--brand); color: #fff; border: none; border-radius: var(--r-sm); padding: 9px 12px; font-size: 13px; cursor: pointer; width: calc(100% - 4px); font-weight: 700; box-shadow: var(--shadow-sm); transition: background .12s; }
-  .add-btn:hover { background: var(--brand-dark); }
-  .share-btn { margin: 0 2px 8px; background: var(--surface); color: var(--brand-dark); border: 1px solid var(--line-strong); border-radius: var(--r-sm); padding: 7px 12px; font-size: 12px; cursor: pointer; width: calc(100% - 4px); font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background .12s, border-color .12s; }
-  .share-btn:hover { background: var(--brand-soft); border-color: var(--brand-soft-border); }
-  .share-btn.copied { background: var(--success-soft); color: var(--success); border-color: var(--success-border); }
+  .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .btn-icon { width: 38px; height: 38px; background: var(--surface-2); color: var(--ink-700); border: none; border-radius: var(--r-sm); font-size: 15px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: background .12s; }
+  .btn-icon:hover { background: var(--line); }
+  .main { flex: 1; padding: 24px 32px 40px; min-width: 0; max-width: 1320px; width: 100%; margin: 0 auto; }
+  .toolbar-row { display: grid; grid-template-columns: minmax(220px,1fr) auto auto; gap: 10px; align-items: center; margin-bottom: 20px; }
+  .toolbar-row input[type=search] { min-height: 38px; }
+  .board { display: grid; grid-template-columns: repeat(4, minmax(230px,1fr)); gap: 14px; }
+  .board-col { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-sm); min-height: 200px; display: flex; flex-direction: column; overflow: hidden; }
+  .board-col.is-flag .board-card { border-color: var(--danger-border); }
+  .board-col-head { padding: 12px 13px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); font-weight: 800; font-size: 12.5px; }
+  .board-count { color: var(--ink-500); font-size: 11.5px; font-weight: 700; background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; }
+  .board-cards { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+  .board-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 12px; box-shadow: var(--shadow-sm); cursor: pointer; transition: box-shadow .12s, transform .08s; }
+  .board-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .board-card-top { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+  .board-card-name { font-size: 13.5px; font-weight: 700; color: var(--ink-900); }
+  .board-card-role { color: var(--ink-500); font-size: 11.5px; margin-top: 2px; }
+  .board-card-foot { margin-top: 9px; display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .board-empty { padding: 20px 12px; text-align: center; color: var(--ink-400); font-size: 11.5px; }
   .card { background: var(--surface); border-radius: var(--r-md); border: 1px solid var(--line); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow-sm); }
   .card-title { font-size: 14.5px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; color: var(--ink-900); letter-spacing: -.01em; }
   .tabs { display: flex; gap: 3px; margin-bottom: 22px; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 3px; flex-wrap: wrap; }
   .tab { padding: 8px 15px; cursor: pointer; font-size: 12.5px; font-weight: 600; color: var(--ink-500); border-radius: 6px; white-space: nowrap; transition: color .12s, background .12s; }
   .tab:hover { color: var(--ink-900); }
   .tab.active { color: var(--ink-900); font-weight: 700; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .view-tabs { display: inline-flex; gap: 3px; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 3px; }
+  .view-tab { padding: 8px 15px; cursor: pointer; font-size: 12.5px; font-weight: 600; color: var(--ink-500); border-radius: 6px; white-space: nowrap; transition: color .12s, background .12s; }
+  .view-tab:hover { color: var(--ink-900); }
+  .view-tab.active { color: var(--ink-900); font-weight: 700; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
   label { font-size: 11.5px; font-weight: 600; color: var(--ink-500); display: block; margin-bottom: 5px; }
   input[type=text], input[type=email], textarea, select { width: 100%; padding: 9px 11px; border: 1px solid var(--line-strong); border-radius: var(--r-sm); font-size: 13px; font-family: inherit; color: var(--ink-900); background: var(--surface-2); transition: border-color .12s, background .12s, box-shadow .12s; }
   input:focus, textarea:focus, select:focus { outline: none; border-color: var(--brand); background: var(--surface); box-shadow: 0 0 0 3px var(--brand-soft); }
@@ -181,25 +177,12 @@
   .intake-freehand-box.open { display: block; }
   .intake-display-row { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; border-bottom: 1px solid var(--surface-2); font-size: 12px; }
   .intake-display-key { min-width: 170px; font-weight: 600; color: var(--ink-500); flex-shrink: 0; }
-  /* Dashboard stat cards */
-  .stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
-  .stat-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: 16px 14px; text-align: center; box-shadow: var(--shadow-sm); }
-  .stat-num { font-size: 25px; font-weight: 800; letter-spacing: -.02em; }
-  .stat-label { font-size: 11px; color: var(--ink-500); margin-top: 3px; font-weight: 600; }
-  /* Table wrapper (dashboard + compare) */
+  /* Table wrapper (compare view) */
   .table-scroll { overflow-x: auto; }
   .data-table { width: 100%; border-collapse: collapse; }
   .data-table thead th { text-align: right; padding: 9px 12px; font-size: 10.5px; font-weight: 700; color: var(--ink-400); text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid var(--line); white-space: nowrap; }
   .data-table thead th.center { text-align: center; }
   .data-table tbody td { padding: 12px; border-bottom: 1px solid var(--surface-2); font-size: 12.5px; vertical-align: middle; }
-  .data-table tbody tr.row-flag { background: var(--danger-soft); }
-  .data-table tbody tr.row-click { cursor: pointer; transition: background .1s; }
-  .data-table tbody tr.row-click:hover { background: var(--surface-2); }
-  .data-table tbody tr.row-flag.row-click:hover { background: #f9dcda; }
-  .row-name-cell { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--ink-900); }
-  .row-avatar { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--brand-soft); color: var(--brand-dark); display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 800; }
-  .row-sub { font-size: 11.5px; color: var(--ink-500); font-weight: 500; }
-  .row-chevron { color: var(--ink-300); font-size: 13px; }
   /* Login screen */
   .login-screen { position: fixed; inset: 0; background: linear-gradient(135deg, #13201d, #28463e 52%, #6b4d2a); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
   .login-card { background: var(--surface); border-radius: var(--r-lg); padding: 34px 32px; width: 380px; max-width: 100%; box-shadow: var(--shadow-lg); text-align: center; }
@@ -210,21 +193,18 @@
   .kicker { font-size: 10.5px; font-weight: 700; color: var(--brand-dark); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
   /* Mobile responsiveness */
   @media (max-width: 880px) {
-    .app { flex-direction: column; height: auto; min-height: 100vh; overflow: visible; }
-    body { overflow-y: auto; }
-    .sidebar { width: 100%; min-width: 0; border-left: none; border-bottom: 1px solid var(--line); max-height: none; }
-    #candidate-nav-list { max-height: 260px; overflow-y: auto; }
-    .main { padding: 18px; }
+    .topbar { padding: 16px 18px; align-items: flex-start; }
+    .header-actions { width: 100%; }
+    .main { padding: 16px; }
+    .toolbar-row { grid-template-columns: 1fr; }
+    .view-tabs { width: 100%; }
+    .view-tabs .view-tab { flex: 1; text-align: center; }
+    .board { grid-template-columns: 1fr; }
     .page-header h1 { font-size: 17px; }
     .card { padding: 15px; }
-    .stat-grid { grid-template-columns: repeat(2,1fr); }
     .form-grid { grid-template-columns: 1fr; }
     .modal { padding: 18px; }
     .intake-display-key { min-width: 130px; font-size: 11px; }
-  }
-  @media (max-width: 480px) {
-    .stat-grid { grid-template-columns: repeat(2,1fr); gap: 8px; }
-    .stat-num { font-size: 21px; }
   }
 </style>
 <!-- LZ-string compression for shorter share codes -->
@@ -260,53 +240,35 @@ var LZString=function(){function o(o,r){if(!t[o]){t[o]={};for(var n=0;n<o.length
 </div>
 
 <div class="app">
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="sidebar-header">
-        <div class="brand-mark">🎯</div>
-        <div class="sidebar-header-text">
-          <h2>גיוס CBO · Fiverr</h2>
-          <small>Fiverr · 2026</small>
-        </div>
-      </div>
+  <header class="topbar">
+    <div>
+      <h1>דשבורד גיוס CBO</h1>
+      <div class="subtitle">ניהול מועמדים משותף לתהליך הגיוס · יעד: 2 מועמדים חזקים תוך שבועיים</div>
       <div id="user-bar" style="display:none;">👤 <span id="user-email"></span> · <a href="#" onclick="doLogout();return false;" style="text-decoration:none;font-weight:600;">התנתק</a></div>
       <div id="sync-status"></div>
     </div>
-    <div class="nav-section">
-      <div class="nav-label">תצוגות</div>
-      <div class="nav-item active" onclick="showView('dashboard')" id="nav-dashboard">📊 דשבורד</div>
-      <div class="nav-item" onclick="showView('compare')" id="nav-compare">⚖️ השוואת מועמדים</div>
-      <div class="nav-item" onclick="showView('guidelines')" id="nav-guidelines">📖 הנחיות</div>
+    <div class="header-actions">
+      <button class="btn btn-primary" onclick="openAddModal()">+ הוסף מועמד</button>
+      <button class="btn-icon" id="share-btn" onclick="copyCode()" title="שלח לעמית (העתק קוד)">📤</button>
+      <button class="btn-icon" onclick="openImport()" title="קבלתי קוד מעמית">📥</button>
     </div>
-    <div class="nav-section">
-      <div class="nav-label">מועמדים</div>
-      <div id="candidate-nav-list"></div>
-    </div>
-    <div class="sidebar-actions">
-      <button class="add-btn" onclick="openAddModal()">+ הוסף מועמד</button>
-      <button class="share-btn" id="share-btn" onclick="copyCode()">📤 שלח לעמית (העתק קוד)</button>
-      <button class="share-btn" style="margin-top:0;" onclick="openImport()">📥 קבלתי קוד מעמית</button>
-    </div>
-  </aside>
+  </header>
 
   <main class="main">
-    <div id="view-dashboard">
-      <div class="page-header">
-        <div>
-          <div class="kicker">סקירה כללית</div>
-          <h1>דשבורד גיוס CBO</h1>
-          <div class="flow-steps" style="direction:ltr;justify-content:flex-end;">
-            <div class="flow-step"><span class="step-badge">1</span> <span class="ilabel label-sharon">שרון</span></div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-step"><span class="step-badge">2</span> <span class="ilabel label-esti">אסתי</span></div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-step"><span class="step-badge">3</span> <span class="ilabel" style="background:#fef3c7;color:#92400e;">ראיון נוסף</span></div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-step"><span class="step-badge">4</span> ⭐ מיכה</div>
-          </div>
-          <p style="margin-top:4px;">יעד: 2 מועמדים חזקים תוך שבועיים</p>
-        </div>
+    <div id="toolbar-row" class="toolbar-row">
+      <input type="search" id="board-search" placeholder="חיפוש לפי שם, תפקיד, חברה או הערה" oninput="renderDashboard()">
+      <select id="board-sort" onchange="renderDashboard()">
+        <option value="score">מיון: ציון</option>
+        <option value="name">מיון: שם</option>
+        <option value="added">מיון: נוסף לאחרונה</option>
+      </select>
+      <div class="view-tabs">
+        <div class="view-tab active" onclick="showView('dashboard')" id="nav-dashboard">לוח</div>
+        <div class="view-tab" onclick="showView('compare')" id="nav-compare">השוואה</div>
+        <div class="view-tab" onclick="showView('guidelines')" id="nav-guidelines">📖 הנחיות</div>
       </div>
+    </div>
+    <div id="view-dashboard">
       <div id="merge-notice"></div>
       <div id="dashboard-content"></div>
     </div>
@@ -534,8 +496,10 @@ function doImport() {
 // ── VIEWS ──
 function showView(view, candidateId) {
   ['dashboard','compare','guidelines','candidate'].forEach(v => document.getElementById('view-'+v).style.display = 'none');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.view-tab').forEach(n => n.classList.remove('active'));
   currentView = view;
+  const toolbar = document.getElementById('toolbar-row');
+  if (toolbar) toolbar.style.display = view === 'candidate' ? 'none' : '';
   if (view === 'dashboard') {
     document.getElementById('view-dashboard').style.display = '';
     document.getElementById('nav-dashboard').classList.add('active');
@@ -552,8 +516,6 @@ function showView(view, candidateId) {
   } else if (view === 'candidate') {
     document.getElementById('view-candidate').style.display = '';
     state.activeCandidate = candidateId;
-    const el = document.getElementById('nav-cand-' + candidateId);
-    if (el) el.classList.add('active');
     renderCandidate(candidateId);
   }
 }
@@ -603,72 +565,57 @@ function interviewProgress(c) {
 }
 function emoji(c) { if(hasRedFlags(c))return'🚩'; const v=overallScore(c); if(!v)return'⬜'; const n=parseFloat(v); return n>=4.5?'🟢':n>=3.5?'🟡':'🔴'; }
 
-// ── SIDEBAR ──
-function renderSidebar() {
-  const list = document.getElementById('candidate-nav-list');
-  if (!state.candidates.length) { list.innerHTML='<div style="padding:8px 16px;font-size:12px;color:#bbb;">אין מועמדים עדיין</div>'; return; }
-  list.innerHTML = state.candidates.map(c => {
-    const sc=overallScore(c), cls=hasRedFlags(c)?'flag':scoreClass(sc);
-    const badge=hasRedFlags(c)?'🚩':sc||'חדש';
-    const active=(state.activeCandidate===c.id&&currentView==='candidate')?'active':'';
-    return `<div class="nav-item candidate-item ${active}" id="nav-cand-${c.id}" onclick="showView('candidate','${c.id}')">
-      <span class="cand-emoji">${emoji(c)}</span>
-      <div class="cand-meta">
-        <div class="cand-name">${escHtml(c.name)}</div>
-        ${c.role?`<div class="cand-role">${escHtml(c.role)}</div>`:''}
-      </div>
-      <span class="sbadge ${cls}">${badge}</span>
-    </div>`;
-  }).join('');
-}
+// ── SIDEBAR (removed — board view is now the candidate list; kept as no-op so existing call sites are harmless) ──
+function renderSidebar() {}
 
-// ── DASHBOARD ──
+// ── DASHBOARD (board view) ──
+const BOARD_COLUMNS = [
+  { key:'new',     label:'חדש',              match: c => !hasRedFlags(c) && interviewProgress(c)===0 },
+  { key:'partial', label:'⏳ ראיון אחד',       match: c => !hasRedFlags(c) && interviewProgress(c)===1 },
+  { key:'ready',   label:'✅ מוכן למיכה',      match: c => !hasRedFlags(c) && interviewProgress(c)>=2 },
+  { key:'flag',    label:'🚩 דגלים אדומים',   match: c => hasRedFlags(c), flagCol:true },
+];
 function renderDashboard() {
   const notice = document.getElementById('merge-notice');
-  if (mergeMessage) { notice.innerHTML=`<div class="alert alert-success" style="margin-bottom:16px;">${mergeMessage}</div>`; mergeMessage=null; }
+  if (mergeMessage) { notice.innerHTML=`<div class="alert alert-success" style="margin-bottom:16px;">${mergeMessage}</div>`; mergeMessage=null; } else { notice.innerHTML=''; }
 
   const el = document.getElementById('dashboard-content');
   if (!state.candidates.length) { el.innerHTML=`<div class="empty"><div class="empty-icon">🎯</div><h3>טרם נוספו מועמדים</h3><p>לחץ על "הוסף מועמד"</p></div>`; return; }
-  const total=state.candidates.length, flagged=state.candidates.filter(c=>hasRedFlags(c)).length;
-  const ready=state.candidates.filter(c=>interviewProgress(c)>=2&&!hasRedFlags(c)).length;
-  const partial=state.candidates.filter(c=>interviewProgress(c)===1).length;
-  el.innerHTML=`
-    <div class="stat-grid">
-      <div class="stat-card"><div class="stat-num" style="color:var(--brand-dark);">${total}</div><div class="stat-label">מועמדים</div></div>
-      <div class="stat-card"><div class="stat-num" style="color:var(--success);">${ready}</div><div class="stat-label">מוכנים למיכה</div></div>
-      <div class="stat-card"><div class="stat-num" style="color:var(--warning);">${partial}</div><div class="stat-label">ראיון אחד</div></div>
-      <div class="stat-card"><div class="stat-num" style="color:var(--danger);">${flagged}</div><div class="stat-label">🚩 דגלים</div></div>
-    </div>
-    <div class="card">
-      <div class="card-title">📋 כל המועמדים</div>
-      <div class="table-scroll">
-      <table class="data-table">
-        <thead><tr>
-          <th>מועמד</th>
-          <th>תפקיד</th>
-          <th class="center"><span class="ilabel label-sharon">שרון</span></th>
-          <th class="center"><span class="ilabel label-esti">אסתי</span></th>
-          <th class="center">ציון</th>
-          <th class="center">סטטוס</th>
-          <th class="center"></th>
-        </tr></thead>
-        <tbody>${state.candidates.map(c=>{
-          const sh=sharonScore(c),es=estiScore(c),ov=overallScore(c),prog=interviewProgress(c),flag=hasRedFlags(c);
-          const statusLabel=flag?'<span class="tag tag-red">🚩 דגל אדום</span>':prog>=2?'<span class="tag tag-green">✅ מוכן למיכה</span>':prog===1?'<span class="tag tag-yellow">⏳ ראיון נוסף</span>':'<span class="tag tag-gray">חדש</span>';
-          const initials = (c.name||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
-          return `<tr class="row-click${flag?' row-flag':''}" onclick="showView('candidate','${c.id}')">
-            <td><div class="row-name-cell"><span class="row-avatar">${escHtml(initials)}</span><span>${emoji(c)} ${escHtml(c.name)}</span></div></td>
-            <td><span class="row-sub">${escHtml(c.role)}${c.company?' · '+escHtml(c.company):''}</span></td>
-            <td style="text-align:center;">${sh?`<span class="score-pill ${scoreClass(sh)}">${sh}</span>`:'<span style="color:var(--ink-300)">—</span>'}</td>
-            <td style="text-align:center;">${es?`<span class="score-pill ${scoreClass(es)}">${es}</span>`:'<span style="color:var(--ink-300)">—</span>'}</td>
-            <td style="text-align:center;">${ov?`<span class="score-pill ${scoreClass(ov)}">${ov}</span>`:'<span style="color:var(--ink-300)">—</span>'}</td>
-            <td style="text-align:center;">${statusLabel}</td>
-            <td style="text-align:center;"><span class="row-chevron">‹</span></td>
-          </tr>`;
-        }).join('')}</tbody>
-      </table>
+
+  const searchEl = document.getElementById('board-search');
+  const sortEl = document.getElementById('board-sort');
+  const q = (searchEl && searchEl.value || '').trim().toLowerCase();
+  const sort = (sortEl && sortEl.value) || 'score';
+
+  let list = state.candidates.filter(c => !q || [c.name,c.role,c.company,c.cv,c.bounty].some(v => String(v||'').toLowerCase().includes(q)));
+  list = [...list].sort((a,b) => {
+    if (sort === 'name') return String(a.name||'').localeCompare(String(b.name||''), 'he');
+    if (sort === 'added') return String(b.id||'').localeCompare(String(a.id||''));
+    return parseFloat(overallScore(b)||0) - parseFloat(overallScore(a)||0);
+  });
+
+  el.innerHTML = `<div class="board">${BOARD_COLUMNS.map(col => {
+    const items = list.filter(col.match);
+    return `<div class="board-col${col.flagCol?' is-flag':''}">
+      <div class="board-col-head"><span>${col.label}</span><span class="board-count">${items.length}</span></div>
+      <div class="board-cards">
+        ${items.length ? items.map(c => {
+          const ov = overallScore(c);
+          return `<div class="board-card" onclick="showView('candidate','${c.id}')">
+            <div class="board-card-top">
+              <div>
+                <div class="board-card-name">${emoji(c)} ${escHtml(c.name)}</div>
+                <div class="board-card-role">${escHtml(c.role)}${c.company?' · '+escHtml(c.company):''}</div>
+              </div>
+            </div>
+            <div class="board-card-foot">
+              ${ov?`<span class="score-pill ${scoreClass(ov)}">${ov}</span>`:'<span class="tag tag-gray">לא דורג</span>'}
+            </div>
+          </div>`;
+        }).join('') : `<div class="board-empty">אין מועמדים בשלב זה</div>`}
       </div>
     </div>`;
+  }).join('')}</div>`;
 }
 
 // ── CANDIDATE ──
